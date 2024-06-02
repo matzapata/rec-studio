@@ -1,7 +1,10 @@
+import Settings from "./screens/settings"
+
 function App(): JSX.Element {
   return (
     <>
-      <h1 className="text-xl">Hello world</h1>
+      <Settings />
+      {/* <SelectLayout /> */}
     </>
   )
 }

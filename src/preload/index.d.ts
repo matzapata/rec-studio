@@ -1,9 +1,17 @@
+import {
+  RecordingGetDesktopSources,
+  RecordingSaveAudio,
+  RecordingSaveCameraVideo,
+  RecordingSaveScreenVideo
+} from '@shared/types'
 
 declare global {
   interface Window {
-    context: {
-      // TODO: define based from index.ts
-      // getNotes: GetNotes
+    recording: {
+      getDesktopSources: RecordingGetDesktopSources
+      saveCameraVideo: RecordingSaveCameraVideo
+      saveScreenVideo: RecordingSaveScreenVideo
+      saveAudio: RecordingSaveAudio
     }
   }
 }

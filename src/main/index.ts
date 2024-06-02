@@ -2,14 +2,30 @@ import { app, shell, BrowserWindow, ipcMain } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
+import {
+  RecordingGetDesktopSources,
+  RecordingSaveAudio,
+  RecordingSaveCameraVideo,
+  RecordingSaveScreenVideo
+} from '@shared/types'
+import { getDesktopSources, saveAudio, saveCameraVideo, saveScreenVideo } from './lib/recording'
 
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 900,
-    height: 670,
+    width: 300,
+    height: 480,
     show: false,
     autoHideMenuBar: true,
+    minimizable: true,
+    maximizable: false,
+    resizable: false,
+    frame: false,
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
+    titleBarStyle: 'hidden',
+    trafficLightPosition: { x: 10, y: 10 },
+
     ...(process.platform === 'linux' ? { icon } : {}),
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
@@ -50,8 +66,19 @@ app.whenReady().then(() => {
     optimizer.watchWindowShortcuts(window)
   })
 
-  // TODO: here register exposed functions
-  ipcMain.on('ping', () => console.log('pong'))
+  // here register exposed functions
+  ipcMain.handle('RecordingGetSources', (_, ...args: Parameters<RecordingGetDesktopSources>) =>
+    getDesktopSources(...args)
+  )
+  ipcMain.handle('RecordingSaveCameraVideo', (_, ...args: Parameters<RecordingSaveCameraVideo>) =>
+    saveCameraVideo(...args)
+  )
+  ipcMain.handle('RecordingSaveScreenVideo', (_, ...args: Parameters<RecordingSaveScreenVideo>) =>
+    saveScreenVideo(...args)
+  )
+  ipcMain.handle('RecordingSaveAudio', (_, ...args: Parameters<RecordingSaveAudio>) =>
+    saveAudio(...args)
+  )
 
   createWindow()
 
