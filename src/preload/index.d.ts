@@ -2,7 +2,8 @@ import {
   RecordingGetDesktopSources,
   RecordingSaveAudio,
   RecordingSaveCameraVideo,
-  RecordingSaveScreenVideo
+  RecordingSaveScreenVideo,
+  ResizeWindow
 } from '@shared/types'
 
 declare global {
@@ -12,6 +13,9 @@ declare global {
       saveCameraVideo: RecordingSaveCameraVideo
       saveScreenVideo: RecordingSaveScreenVideo
       saveAudio: RecordingSaveAudio
+    }
+    context: {
+      resizeWindow: ResizeWindow
     }
   }
 }

@@ -6,9 +6,13 @@ import {
   RecordingGetDesktopSources,
   RecordingSaveAudio,
   RecordingSaveCameraVideo,
-  RecordingSaveScreenVideo
+  RecordingSaveScreenVideo,
+  ResizeWindow
 } from '@shared/types'
 import { getDesktopSources, saveAudio, saveCameraVideo, saveScreenVideo } from './lib/recording'
+import { resizeWindow } from './lib/context'
+
+app.commandLine.appendSwitch('disable-features', 'IOSurfaceCapturer')
 
 function createWindow(): void {
   // Create the browser window.
@@ -33,6 +37,7 @@ function createWindow(): void {
       contextIsolation: true
     }
   })
+  mainWindow.setContentProtection(true)
 
   mainWindow.on('ready-to-show', () => {
     mainWindow.show()
@@ -51,6 +56,8 @@ function createWindow(): void {
     mainWindow.loadFile(join(__dirname, '../renderer/index.html'))
   }
 }
+
+app.commandLine.appendSwitch('enable-features', 'ScreenCaptureKitMac')
 
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
@@ -79,6 +86,7 @@ app.whenReady().then(() => {
   ipcMain.handle('RecordingSaveAudio', (_, ...args: Parameters<RecordingSaveAudio>) =>
     saveAudio(...args)
   )
+  ipcMain.handle('ResizeWindow', (_, ...args: Parameters<ResizeWindow>) => resizeWindow(...args))
 
   createWindow()
 

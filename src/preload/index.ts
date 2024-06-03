@@ -2,7 +2,8 @@ import {
   RecordingGetDesktopSources,
   RecordingSaveAudio,
   RecordingSaveCameraVideo,
-  RecordingSaveScreenVideo
+  RecordingSaveScreenVideo,
+  ResizeWindow
 } from '@shared/types'
 import { contextBridge, ipcRenderer } from 'electron'
 
@@ -20,6 +21,9 @@ try {
       ipcRenderer.invoke('RecordingSaveScreenVideo', ...args),
     saveAudio: (...args: Parameters<RecordingSaveAudio>) =>
       ipcRenderer.invoke('RecordingSaveAudio', ...args)
+  })
+  contextBridge.exposeInMainWorld('context', {
+    resizeWindow: (...args: Parameters<ResizeWindow>) => ipcRenderer.invoke('ResizeWindow', ...args)
   })
 } catch (error) {
   console.error(error)
