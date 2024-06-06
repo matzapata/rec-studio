@@ -1,11 +1,14 @@
-import Settings from "./screens/settings"
+import { Toaster } from "@renderer/components/ui/toaster"
+import Editing from "@renderer/screens/editing"
+// import Recording from "@renderer/screens/recording"
 
 function App(): JSX.Element {
   return (
-    <>
-      <Settings />
-      {/* <SelectLayout /> */}
-    </>
+    <div className="dark">
+      {/* <Recording /> */}
+      <Editing />
+      <Toaster />
+    </div>
   )
 }
 

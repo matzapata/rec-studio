@@ -1,5 +1,4 @@
 import { JSX, useEffect, useRef, useState } from 'react'
-import { RecordRTCPromisesHandler } from 'recordrtc'
 import { Buffer } from 'buffer'
 import {
   Camera,
@@ -11,8 +10,8 @@ import {
   RotateCcw,
   Trash2
 } from 'lucide-react'
-import brokenImage from '@renderer/assets/images/broken-image.gif'
 import { useStopwatch } from 'react-timer-hook'
+import { useRecorder } from '@renderer/hooks/use-recorder'
 
 interface SourceDevice {
   id: string
@@ -24,7 +23,7 @@ const NULL_SOURCE_ID = 'null'
 const shortenLabel = (label: string, length: number = 12) =>
   label.length > length ? label.substring(0, length) + '...' : label
 
-export default function Settings(): JSX.Element {
+export default function Recording(): JSX.Element {
   const videoRef = useRef(null)
   const [recording, setRecording] = useState(false)
   const [audioSources, setAudioSources] = useState<SourceDevice[]>([])
@@ -35,12 +34,9 @@ export default function Settings(): JSX.Element {
   const [selectedDesktopSource, setSelectedDesktopSource] = useState<string>(NULL_SOURCE_ID)
   const chronometer = useStopwatch({ autoStart: false })
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [cameraRecorder, setCameraRecorder] = useState<any | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [audioRecorder, setAudioRecorder] = useState<any | null>(null)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [desktopRecorder, setDesktopRecorder] = useState<any | null>(null)
+  const cameraRecorder = useRecorder()
+  const audioRecorder = useRecorder()
+  const desktopRecorder = useRecorder()
 
   function getAvailableSources() {
     navigator.mediaDevices
@@ -71,102 +67,55 @@ export default function Settings(): JSX.Element {
     })
   }
 
-  const startCameraRecording = async (cameraId: string) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: { deviceId: cameraId },
-      audio: false
-    })
-    const recorder = new RecordRTCPromisesHandler(stream, {
-      type: 'video'
-    })
-    recorder.startRecording()
-    setCameraRecorder(recorder)
-  }
-
-  const stopCameraRecording = async () => {
-    if (!cameraRecorder) return
-
-    await cameraRecorder.stopRecording()
-    const blob: Blob = await cameraRecorder.getBlob()
-    window.recording
-      .saveCameraVideo(Buffer.from(await blob.arrayBuffer()))
-      .then(() => console.log('OK'))
-      .then(() => setCameraRecorder(null))
-      .catch(console.log)
-  }
-
-  const startDesktopRecording = async (desktopId: string) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const stream = await (navigator.mediaDevices as any).getUserMedia({
-      video: {
-        mandatory: {
-          chromeMediaSource: 'desktop',
-          chromeMediaSourceId: desktopId
-        }
-      },
-      audio: false
-    })
-    const recorder = new RecordRTCPromisesHandler(stream, {
-      type: 'video',
-      mimeType: 'video/mp4',
-    })
-    recorder.startRecording()
-    setDesktopRecorder(recorder)
-  }
-
-  const stopDesktopRecording = async () => {
-    if (!desktopRecorder) return
-
-    await desktopRecorder.stopRecording()
-    const blob: Blob = await desktopRecorder.getBlob()
-    window.recording
-      .saveScreenVideo(Buffer.from(await blob.arrayBuffer()))
-      .then(() => console.log('OK'))
-      .then(() => setDesktopRecorder(null))
-      .catch(console.log)
-  }
-
-  const startAudioRecording = async (audioId: string) => {
-    const stream = await navigator.mediaDevices.getUserMedia({
-      video: false,
-      audio: { deviceId: audioId }
-    })
-    const recorder = new RecordRTCPromisesHandler(stream, {
-      type: 'audio',
-      mimeType: 'audio/webm'
-    })
-    recorder.startRecording()
-    setAudioRecorder(recorder)
-  }
-
-  const stopAudioRecording = async () => {
-    if (!audioRecorder) return
-
-    await audioRecorder.stopRecording()
-    const blob: Blob = await audioRecorder.getBlob()
-    window.recording
-      .saveAudio(Buffer.from(await blob.arrayBuffer()))
-      .then(() => console.log('OK'))
-      .then(() => setAudioRecorder(null))
-      .catch(console.log)
-  }
-
   function startRecording() {
     setRecording(true)
     chronometer.start()
 
     return Promise.all([
-      startAudioRecording(selectedAudioSource),
-      startCameraRecording(selectedCameraSource),
-      startDesktopRecording(selectedDesktopSource)
+      audioRecorder.startRecording(
+        {
+          video: false,
+          audio: { deviceId: selectedAudioSource }
+        },
+        { type: 'audio' }
+      ),
+      cameraRecorder.startRecording(
+        {
+          video: { deviceId: selectedCameraSource },
+          audio: false
+        },
+        { type: 'video' }
+      ),
+      desktopRecorder.startRecording(
+        {
+          video: {
+            mandatory: {
+              chromeMediaSource: 'desktop',
+              chromeMediaSourceId: selectedDesktopSource
+            }
+          },
+          audio: false
+        },
+        { type: 'video' }
+      )
     ])
   }
 
   async function stopRecording() {
     setRecording(false)
-    chronometer.reset()
+    chronometer.reset(undefined, false)
 
-    return Promise.all([stopAudioRecording(), stopCameraRecording(), stopDesktopRecording()])
+    await Promise.all([
+      audioRecorder
+        .stopRecording()
+        .then((buff) => buff && window.recording.saveAudio(Buffer.from(buff))),
+      cameraRecorder
+        .stopRecording()
+        .then((buff) => buff && window.recording.saveCameraVideo(Buffer.from(buff))),
+      desktopRecorder
+        .stopRecording()
+        .then((buff) => buff && window.recording.saveScreenVideo(Buffer.from(buff)))
+    ])
   }
 
   // load camera preview
@@ -203,7 +152,7 @@ export default function Settings(): JSX.Element {
   }, [selectedCameraSource])
 
   return (
-    <body className="h-screen">
+    <body className="h-screen bg-slate-950">
       <div className="flex flex-col h-full">
         <header className="h-8  top-0 left-0 w-screen"></header>
 
@@ -214,14 +163,10 @@ export default function Settings(): JSX.Element {
             autoPlay
             className={`${selectedCameraSource === NULL_SOURCE_ID ? 'hidden' : ''} h-full rounded-md w-full object-cover`}
           ></video>
-          <div
-            style={{ backgroundImage: `url(${brokenImage})` }}
-            className={`${selectedCameraSource === NULL_SOURCE_ID ? '' : 'hidden'} h-full rounded-md w-full bg-gray-700`}
-          ></div>
 
           {/* Controls */}
           <div
-            className={`${recording ? 'pl-16' : ''} absolute bottom-0 left-0 right-0 flex  items-center justify-center py-4 space-x-4`}
+            className={`pl-16 absolute bottom-0 left-0 right-0 flex  items-center justify-center py-4 space-x-4`}
           >
             {/* Recording circle */}
             <div className="h-10 w-10 border-2 bg-transparent border-white rounded-full flex justify-center items-center">
@@ -238,19 +183,17 @@ export default function Settings(): JSX.Element {
               )}
             </div>
 
-            {recording && (
-              <div className="bg-gray-800/50 px-3 py-0.5 rounded-full">
-                <p className="text-xs text-white">
-                  {String(chronometer.minutes).padStart(2, '0')}:
-                  {String(chronometer.seconds).padStart(2, '0')}
-                </p>
-              </div>
-            )}
+            <div className="bg-gray-800/50 px-3 py-0.5 rounded-full">
+              <p className="text-xs text-white">
+                {String(chronometer.minutes).padStart(2, '0')}:
+                {String(chronometer.seconds).padStart(2, '0')}
+              </p>
+            </div>
           </div>
         </div>
 
         {/* Settings and commands */}
-        <div className="flex px-1 mb-1 h-14">
+        <div className="flex px-1 mb-1 h-14 text-white">
           {recording ? (
             <>
               {/* Cancel */}
@@ -262,7 +205,7 @@ export default function Settings(): JSX.Element {
               </button>
 
               {/* Restart */}
-              <button className="h-14 w-full relative hover:bg-gray-100 rounded-md">
+              <button className="h-14 w-full relative hover:bg-slate-800 rounded-md">
                 <div className="h-full space-y-1 flex flex-col items-center justify-center">
                   <RotateCcw className="h-5 w-5" />
                   <p className="text-xs">Restart</p>

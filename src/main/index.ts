@@ -17,8 +17,13 @@ app.commandLine.appendSwitch('disable-features', 'IOSurfaceCapturer')
 function createWindow(): void {
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 300,
-    height: 470,
+    // recording
+    // width: 300,
+    // height: 470,
+    // editing
+    width: 1080,
+    height: 720,
+
     show: false,
     autoHideMenuBar: true,
     minimizable: true,
