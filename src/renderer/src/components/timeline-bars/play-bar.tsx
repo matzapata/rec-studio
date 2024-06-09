@@ -4,7 +4,7 @@ import Draggable from 'react-draggable'
 
 export function PlayBar() {
   return (
-    <div className="px-6 pt-4 bg-card border-t">
+    <div className="px-6 pt-4 bg-card border-t space-y-2">
       <div className="w-full flex justify-between">
         {/* play controls */}
         <div className="flex space-x-3 items-center">
@@ -26,7 +26,7 @@ export function PlayBar() {
       <div className="py-8 ">
         <div className="relative h-[40px]">
           <Draggable axis="x" bounds="parent">
-            <div className="w-1 h-12 z-20 bg-red-600 rounded-sm cursor-pointer absolute -top-1"></div>
+            <div className="w-1 h-14 z-30 bg-red-600 rounded-sm cursor-pointer absolute -top-2"></div>
           </Draggable>
 
           <div style={{ width: '100%' }} className="relative rounded-md h-full flex border"></div>

@@ -1,15 +1,11 @@
-import { useState } from 'react'
 import { ScrollArea } from '../ui/scroll-area'
+import { useAtom } from 'jotai'
+import { Layouts, layoutAtom } from '@renderer/store/editing'
 
-export enum Layouts {
-  SCREEN_ONLY,
-  SCREEN_BACKGROUND,
-  SCREEN_CAMERA_RIGHT,
-  SCREEN_CAMERA_LEFT,
-}
+
 
 export function LayoutPanel() {
-  const [selected, setSelected] = useState<Layouts>(Layouts.SCREEN_ONLY)
+  const [layout, setLayout] = useAtom(layoutAtom)
 
   return (
     <div className="flex flex-col ">
@@ -18,31 +14,31 @@ export function LayoutPanel() {
         <p className="text-gray-300 text-xs mb-2">Horizontal</p>
         <div className="grid grid-cols-2 gap-2 w-full">
           {/* Screen only */}
-          <button onClick={() => setSelected(Layouts.SCREEN_ONLY)}>
+          <button onClick={() => setLayout(Layouts.SCREEN_ONLY)}>
             <div
-              className={`${selected === Layouts.SCREEN_ONLY ? 'border-white' : ''} hover:border-white hover:bg-muted h-[100px] border-2 rounded-lg flex items-center justify-center bg-muted/90`}
+              className={`${layout === Layouts.SCREEN_ONLY ? 'border-white' : ''} hover:border-white hover:bg-muted h-[100px] border-2 rounded-lg flex items-center justify-center bg-muted/90`}
             ></div>
           </button>
           {/* Screen background */}
-          <button onClick={() => setSelected(Layouts.SCREEN_BACKGROUND)}>
+          <button onClick={() => setLayout(Layouts.SCREEN_BACKGROUND)}>
             <div
-              className={`${selected === Layouts.SCREEN_BACKGROUND ? 'border-white' : ''} hover:border-white hover:bg-muted/50 bg-muted/30 h-[100px] border-2 rounded-lg flex items-center justify-center`}
+              className={`${layout === Layouts.SCREEN_BACKGROUND ? 'border-white' : ''} hover:border-white hover:bg-muted/50 bg-muted/30 h-[100px] border-2 rounded-lg flex items-center justify-center`}
             >
               <div className="h-[80px] w-[80%] rounded-md border-2 bg-muted"></div>
             </div>
           </button>
           {/* Screen camera right */}
-          <button onClick={() => setSelected(Layouts.SCREEN_CAMERA_RIGHT)}>
+          <button onClick={() => setLayout(Layouts.SCREEN_CAMERA_RIGHT)}>
             <div
-              className={`${selected === Layouts.SCREEN_CAMERA_RIGHT ? 'border-white' : ''} hover:border-white hover:bg-muted/50 bg-muted/30 h-[100px] border-2 rounded-md flex items-center justify-evenly`}
+              className={`${layout === Layouts.SCREEN_CAMERA_RIGHT ? 'border-white' : ''} hover:border-white hover:bg-muted/50 bg-muted/30 h-[100px] border-2 rounded-md flex items-center justify-evenly`}
             >
               <div className="h-[80px] w-[60%] rounded-md border-2 bg-muted"></div>
               <div className="h-[60px] w-[20%] rounded-md border-2 bg-muted"></div>
             </div>
           </button>
-          <button onClick={() => setSelected(Layouts.SCREEN_CAMERA_LEFT)}>
+          <button onClick={() => setLayout(Layouts.SCREEN_CAMERA_LEFT)}>
             <div
-              className={`${selected === Layouts.SCREEN_CAMERA_LEFT ? 'border-white' : ''} hover:border-white hover:bg-muted/50 bg-muted/30 h-[100px] border-2 rounded-md flex items-center justify-evenly`}
+              className={`${layout === Layouts.SCREEN_CAMERA_LEFT ? 'border-white' : ''} hover:border-white hover:bg-muted/50 bg-muted/30 h-[100px] border-2 rounded-md flex items-center justify-evenly`}
             >
               <div className="h-[60px] w-[20%] rounded-md border-2 bg-muted"></div>
               <div className="h-[80px] w-[60%] rounded-md border-2 bg-muted"></div>

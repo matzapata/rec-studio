@@ -1,4 +1,4 @@
-import { Crop, Image, LayoutTemplate, Scissors, Spline, ZoomIn } from 'lucide-react'
+import { Image, LayoutTemplate, Scissors, Spline, ZoomIn } from 'lucide-react'
 import { useState } from 'react'
 import { BackgroundPanel } from '@renderer/components/editing-panels/background-panel'
 import { ZoomPanel } from '@renderer/components/editing-panels/zoom-panel'
@@ -29,16 +29,16 @@ export default function Editing() {
       <div className="flex flex-col h-full">
         <header className="h-12 mb-2  top-0 left-0 w-screen border-b"></header>
 
-        <div className="grid grid-cols-6 h-full gap-2 pb-2">
+        <div className="flex h-full gap-2 pb-2">
           {/* preview */}
-          <div className="flex flex-col col-span-4 pl-2">
-            <div className="flex  flex-grow items-start">
+          <div className="flex w-full flex-col pl-2">
+            <div className="flex w-full  flex-grow items-start">
               <img className="object-contain rounded-xl border-4" src={mockFrame} />
             </div>
           </div>
 
           {/* tools panel */}
-          <div className="col-span-2 pr-2 flex space-x-2">
+          <div style={{ width: '800px' }} className="pr-2 flex space-x-2">
             {/* panel */}
             <div className="rounded-md bg-card w-full p-6 border">
               {panel === EditingPanel.BACKGROUND ? (
