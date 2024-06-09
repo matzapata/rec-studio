@@ -5,12 +5,10 @@ import { ZoomPanel } from '@renderer/components/editing-panels/zoom-panel'
 import { PlayBar } from '@renderer/components/timeline-bars/play-bar'
 import { TrimBar } from '@renderer/components/timeline-bars/trim-bar'
 import { ZoomBar } from '@renderer/components/timeline-bars/zoom-bar'
-
-// mock images
-import mockFrame from '@renderer/assets/images/frame.png'
 import { LayoutPanel } from '@renderer/components/editing-panels/layout-panel'
 import { BorderPanel } from '@renderer/components/editing-panels/border-panel'
 import { TrimPanel } from '@renderer/components/editing-panels/trim-panel'
+import { Preview } from '@renderer/components/preview/preview'
 
 enum EditingPanel {
   BACKGROUND,
@@ -33,7 +31,7 @@ export default function Editing() {
           {/* preview */}
           <div className="flex w-full flex-col pl-2">
             <div className="flex w-full  flex-grow items-start">
-              <img className="object-contain rounded-xl border-4" src={mockFrame} />
+              <Preview />
             </div>
           </div>
 

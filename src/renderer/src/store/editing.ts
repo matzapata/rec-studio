@@ -31,7 +31,7 @@ export interface ClipSpec {
   toFrameNumber: number
 }
 
-export const backgroundAtom = atom<string>('')
+export const backgroundAtom = atom<string>(backgrounds[0])
 
 export const borderAtom = atom<BorderShape>(BorderShape.ROUNDED)
 
